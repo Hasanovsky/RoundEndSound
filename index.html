@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>RoundEndSound Generator</title>
+<title>RoundEndSound Config Generator</title>
 
 <style>
 * {
@@ -22,62 +22,94 @@ body {
 
 .container {
     background: #1f2937;
-    padding: 25px;
+    padding: 20px;
     border-radius: 15px;
-    width: 500px;
+    width: 600px;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 h2 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+}
+
+/* СКРОЛЛ ОБЛАСТЬ */
+.inputs-container {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+    margin-bottom: 10px;
+}
+
+/* КРАСИВЫЙ СКРОЛЛ */
+.inputs-container::-webkit-scrollbar {
+    width: 6px;
+}
+.inputs-container::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 10px;
 }
 
 .row {
     display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 8px;
+    margin-bottom: 8px;
 }
 
 input {
     flex: 1;
-    padding: 8px;
-    border-radius: 8px;
+    padding: 7px;
+    border-radius: 6px;
     border: none;
     outline: none;
+    font-size: 13px;
 }
 
 input:focus {
     box-shadow: 0 0 5px #3b82f6;
 }
 
-.buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
-}
-
 button {
     border: none;
-    border-radius: 10px;
-    padding: 10px 15px;
+    border-radius: 8px;
+    padding: 8px 12px;
     cursor: pointer;
     font-weight: bold;
     transition: 0.2s;
 }
 
+.controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.left-buttons {
+    display: flex;
+    gap: 10px;
+}
+
 .add-btn {
     background: #10b981;
-    color: white;
 }
 
 .add-btn:hover {
     background: #059669;
 }
 
+.add10-btn {
+    background: #22c55e;
+}
+
+.add10-btn:hover {
+    background: #16a34a;
+}
+
 .generate-btn {
     background: #3b82f6;
-    color: white;
 }
 
 .generate-btn:hover {
@@ -86,8 +118,7 @@ button {
 
 .remove-btn {
     background: #ef4444;
-    color: white;
-    padding: 0 10px;
+    padding: 0 8px;
 }
 
 .remove-btn:hover {
@@ -99,18 +130,22 @@ button {
 <body>
 
 <div class="container">
-    <h2>🎵 RoundEndSound Generator</h2>
+    <h2>🎵 RoundEndSound Config Generator</h2>
 
-    <div id="inputs"></div>
+    <div id="inputs" class="inputs-container"></div>
 
-    <div class="buttons">
-        <button class="add-btn" onclick="addRow()">➕ Добавить</button>
+    <div class="controls">
+        <div class="left-buttons">
+            <button class="add-btn" onclick="addRow()">➕</button>
+            <button class="add10-btn" onclick="addMultiple(10)">+10</button>
+        </div>
+
         <button class="generate-btn" onclick="generateConfig()">Создать конфиг</button>
     </div>
 </div>
 
 <script>
-function addRow() {
+function createRow() {
     const div = document.createElement("div");
     div.className = "row";
 
@@ -120,28 +155,43 @@ function addRow() {
         <button class="remove-btn" onclick="this.parentElement.remove()">✖</button>
     `;
 
-    document.getElementById("inputs").appendChild(div);
+    return div;
 }
 
-// первая строка
-addRow();
+function addRow() {
+    document.getElementById("inputs").appendChild(createRow());
+}
+
+function addMultiple(count) {
+    const container = document.getElementById("inputs");
+
+    for (let i = 0; i < count; i++) {
+        container.appendChild(createRow());
+    }
+}
+
+// стартовые строки
+addMultiple(3);
 
 function generateConfig() {
     const rows = document.querySelectorAll(".row");
 
     let musicBlock = "";
 
-    rows.forEach((row, index) => {
+    let index = 1;
+
+    rows.forEach(row => {
         const inputs = row.querySelectorAll("input");
         const song = inputs[0].value.trim();
         const sound = inputs[1].value.trim();
 
         if (song && sound) {
-            musicBlock += `        "${index + 1}"\n`;
+            musicBlock += `        "${index}"\n`;
             musicBlock += `        {\n`;
             musicBlock += `            "Name"        "${song}"\n`;
             musicBlock += `            "Sound"       "${sound}"\n`;
             musicBlock += `        }\n`;
+            index++;
         }
     });
 
