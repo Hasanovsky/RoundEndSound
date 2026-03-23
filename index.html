@@ -4,12 +4,11 @@
 <meta charset="UTF-8">
 <title>RoundEndSound Generator</title>
 
-<!-- Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
 body {
-    background: linear-gradient(135deg, #141e30, #000000);
+    background: linear-gradient(135deg, #0f172a, #000000);
     height: 100vh;
     display: flex;
     align-items: center;
@@ -17,60 +16,125 @@ body {
     color: white;
 }
 
+/* Container */
 .container-box {
-    background: #00000012;
+    background: rgba(28, 28, 30, 0.15);
     padding: 20px;
-    /*border-radius: 15px;*/
     width: 800px;
     height: 85vh;
     display: flex;
     flex-direction: column;
+    backdrop-filter: blur(20px);
+    /*border-radius: 16px;*/
+    /*border: 1px solid rgba(255,255,255,0.08);*/
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
 }
 
-/* scrollbar */
-
-::-webkit-scrollbar-thumb {
-  border-width: 1px 1px 1px 2px;
-  background-color: #ffffff;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  border-width: 1px 1px 1px 2px;
-  border-color: var(--span);
-  background-color: var(--span);
-}
-
-::-webkit-scrollbar-track {
-  border-width: 0;
-}
-
-::-webkit-scrollbar-track:hover {
-      background-color: #ffffff;
-}
-
-::-webkit-scrollbar {
-  background-color: #00000000;
-  width: 2px;
-  height: 2px;
-}
-
+/* Inputs container */
 .inputs-container {
     flex: 1;
     overflow-y: auto;
+    padding-right: 6px;
 }
 
+/* ✨ Apple-style thin scrollbar */
+.inputs-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.inputs-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.inputs-container::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.18);
+    border-radius: 10px;
+    transition: 0.2s;
+}
+
+.inputs-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* Firefox */
+.inputs-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+}
+
+/* Row */
 .row-item {
     display: flex;
-    gap: 6px;
-    margin-bottom: 8px;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
-input {
-    font-size: 13px !important;
+/* Inputs */
+.input-group-custom {
+    position: relative;
+    flex: 1;
+}
+
+.input-group-custom input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: white;
+    outline: none;
+    transition: 0.2s;
+    font-size: 13px;
+}
+
+.input-group-custom input:focus {
+    border-color: rgba(0,122,255,0.8);
+    box-shadow: 0 0 0 2px rgba(0,122,255,0.25);
+}
+
+.input-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.6;
 }
 
 .invalid {
-    border: 2px solid #ef4444 !important;
+    border: 1px solid #ff3b30 !important;
+}
+
+/* Buttons (Apple style) */
+.btn {
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-weight: 500;
+    font-size: 13px;
+    background: rgba(255,255,255,0.05);
+    color: white;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: scale(0.96);
+    background: rgba(255,255,255,0.12);
+}
+
+.btn-danger {
+    color: #ff6b6b;
+}
+
+.btn-danger:hover {
+    background: rgba(255,59,48,0.15);
+    border-color: rgba(255,59,48,0.4);
 }
 </style>
 </head>
@@ -84,19 +148,18 @@ input {
 
     <div class="d-flex justify-content-between">
         <div class="d-flex gap-2">
-            <button class="btn btn-success" onclick="addRow()">➕</button>
-            <button class="btn btn-success" onclick="addMultiple(10)">+10</button>
+            <button class="btn" onclick="addRow()">➕</button>
+            <button class="btn" onclick="addMultiple(10)">+10</button>
         </div>
 
         <div class="d-flex gap-2">
-            <button class="btn btn-primary" onclick="generateINI()">Создать ini</button>
-            <button class="btn btn-warning" onclick="generateVSNDEvents()">Создать vsndevts</button>
+            <button class="btn" onclick="generateINI()">Создать ini</button>
+            <button class="btn" onclick="generateVSNDEvents()">Создать vsndevts</button>
         </div>
     </div>
 </div>
 
 <script>
-
 function isValidEventName(name) {
     return /^[A-Za-z_][A-Za-z0-9_.]*$/.test(name);
 }
@@ -106,13 +169,24 @@ function createRow() {
     div.className = "row-item";
 
     div.innerHTML = `
-        <input type="text" class="form-control" placeholder="Название песни">
-        <input type="text" class="form-control event-input" placeholder="SoundEvent Name">
-        <input type="text" class="form-control" placeholder="SoundPath (sounds/... .vsnd)">
-        <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">✖</button>
+        <div class="input-group-custom">
+            <span class="input-icon">🎵</span>
+            <input type="text" placeholder="Название песни">
+        </div>
+
+        <div class="input-group-custom">
+            <span class="input-icon">⚡</span>
+            <input type="text" class="event-input" placeholder="SoundEvent Name">
+        </div>
+
+        <div class="input-group-custom">
+            <span class="input-icon">📁</span>
+            <input type="text" placeholder="sounds/... .vsnd">
+        </div>
+
+        <button class="btn btn-danger" onclick="this.parentElement.remove()">✖</button>
     `;
 
-    // 👉 Валидация при вводе
     const eventInput = div.querySelector(".event-input");
 
     eventInput.addEventListener("input", () => {
@@ -159,14 +233,15 @@ function generateINI() {
 
     rows.forEach(row => {
         const inputs = row.querySelectorAll("input");
-        const song = inputs[0].value.trim();
-        const sound = inputs[1].value.trim();
 
-        if (song && sound) {
+        const song = inputs[0].value.trim();
+        const eventName = inputs[1].value.trim();
+
+        if (song && eventName) {
             musicBlock += `        "${index}"\n`;
             musicBlock += `        {\n`;
             musicBlock += `            "Name" "${song}"\n`;
-            musicBlock += `            "Sound" "${sound}"\n`;
+            musicBlock += `            "Sound" "${eventName}"\n`;
             musicBlock += `        }\n`;
             index++;
         }
@@ -187,27 +262,77 @@ ${musicBlock}
 }
 
 function generateVSNDEvents() {
-    if (!validateAll()) return;
+    const rows = document.querySelectorAll(".row-item"); // ✅ исправлено
 
-    const rows = document.querySelectorAll(".row-item");
     let eventsBlock = "";
 
     rows.forEach(row => {
         const inputs = row.querySelectorAll("input");
-        const eventName = inputs[1].value.trim();
-        const path = inputs[2].value.trim();
+
+        const eventName = inputs[1]?.value.trim();
+        const path = inputs[2]?.value.trim();
 
         if (eventName && path) {
-            eventsBlock += `    ${eventName} =\n`;
+            eventsBlock += `    ${eventName} = \n`;
             eventsBlock += `    {\n`;
             eventsBlock += `        base = "roundendsound.base"\n`;
             eventsBlock += `        vsnd_files = "${path}"\n`;
-            eventsBlock += `        volume = 1.0\n`;
+            eventsBlock += `        volume = 1.000000\n`;
             eventsBlock += `    }\n`;
         }
     });
 
-    const config = `{
+    const config = `<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+    Event.CTWin = 
+    {
+        type = "csgo_mega"
+        volume = 0.000000
+    }
+    Event.TERWin = 
+    {
+        type = "csgo_mega"
+        volume = 0.000000
+    }
+    Announcer.CTWin.CS2_Classic = 
+    {
+        type = "csgo_mega"
+        volume = 0.000000
+    }
+    Announcer.TWin.CS2_Classic = 
+    {
+        type = "csgo_mega"
+        volume = 0.000000
+    }
+    roundendsound.base = 
+    {
+        type = "csgo_music"
+        priority = 5.000000
+        stop_music = "true"
+        volume_fade_out_input_max = 1.600000
+        loop_track = "false"
+        should_queue_track = "true"
+        block_won_lost = "true"
+        startpoint_01 = 0.000000
+        startpoint_02 = 0.000000
+        startpoint_03 = 0.000000
+        endpoint_01 = 0.000000
+        endpoint_02 = 0.000000
+        endpoint_03 = 0.000000
+        syncpoints_01 = 
+        [
+            0.000000,
+        ]
+        syncpoints_02 = 
+        [
+            0.000000,
+        ]
+        syncpoints_03 = 
+        [
+            0.000000,
+        ]
+    }
+
 ${eventsBlock}
 }`;
 
