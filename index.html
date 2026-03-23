@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>RoundEndSound Config Generator</title>
+<style>
+    body {
+        font-family: Arial;
+        background: #1e1e1e;
+        color: white;
+        padding: 20px;
+    }
+
+    .row {
+        margin-bottom: 10px;
+    }
+
+    input {
+        padding: 5px;
+        margin-right: 10px;
+    }
+
+    button {
+        padding: 8px 12px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<h2>Генератор RoundEndSound</h2>
+
+<div id="inputs"></div>
+
+<button onclick="addRow()">➕ Добавить</button>
+<br><br>
+<button onclick="generateConfig()">Создать конфиг</button>
+
+<script>
+function addRow() {
+    const div = document.createElement("div");
+    div.className = "row";
+
+    div.innerHTML = `
+        <input type="text" placeholder="Название песни">
+        <input type="text" placeholder="SoundEvent Name">
+    `;
+
+    document.getElementById("inputs").appendChild(div);
+}
+
+// Добавляем первую строку
+addRow();
+
+function generateConfig() {
+    const rows = document.querySelectorAll(".row");
+
+    let musicBlock = "";
+
+    rows.forEach((row, index) => {
+        const inputs = row.querySelectorAll("input");
+        const song = inputs[0].value;
+        const sound = inputs[1].value;
+
+        if (song && sound) {
+            musicBlock += `        "${index + 1}"\n`;
+            musicBlock += `        {\n`;
+            musicBlock += `            "Name"        "${song}"\n`;
+            musicBlock += `            "Sound"       "${sound}"\n`;
+            musicBlock += `        }\n`;
+        }
+    });
+
+    const config = `"RoundEndSound"
+{
+    "DefaultVolume"                 "5"
+    "DisableRandom"                 "0"
+
+    "Music"
+    {
+${musicBlock}
+    }
+}`;
+
+    const blob = new Blob([config], { type: "text/plain" });
+    const a = document.createElement("a");
+
+    a.href = URL.createObjectURL(blob);
+    a.download = "roundendsound.ini";
+    a.click();
+}
+</script>
+
+</body>
+</html>
