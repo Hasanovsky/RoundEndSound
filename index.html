@@ -2,40 +2,112 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>RoundEndSound Config Generator</title>
+<title>RoundEndSound Generator</title>
+
 <style>
-    body {
-        font-family: Arial;
-        background: #1e1e1e;
-        color: white;
-        padding: 20px;
-    }
+* {
+    box-sizing: border-box;
+}
 
-    .row {
-        margin-bottom: 10px;
-    }
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #141e30, #243b55);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
 
-    input {
-        padding: 5px;
-        margin-right: 10px;
-    }
+.container {
+    background: #1f2937;
+    padding: 25px;
+    border-radius: 15px;
+    width: 500px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
 
-    button {
-        padding: 8px 12px;
-        margin-top: 10px;
-        cursor: pointer;
-    }
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+input {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+}
+
+input:focus {
+    box-shadow: 0 0 5px #3b82f6;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.add-btn {
+    background: #10b981;
+    color: white;
+}
+
+.add-btn:hover {
+    background: #059669;
+}
+
+.generate-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.generate-btn:hover {
+    background: #2563eb;
+}
+
+.remove-btn {
+    background: #ef4444;
+    color: white;
+    padding: 0 10px;
+}
+
+.remove-btn:hover {
+    background: #dc2626;
+}
 </style>
 </head>
+
 <body>
 
-<h2>Генератор RoundEndSound</h2>
+<div class="container">
+    <h2>🎵 RoundEndSound Generator</h2>
 
-<div id="inputs"></div>
+    <div id="inputs"></div>
 
-<button onclick="addRow()">➕ Добавить</button>
-<br><br>
-<button onclick="generateConfig()">Создать конфиг</button>
+    <div class="buttons">
+        <button class="add-btn" onclick="addRow()">➕ Добавить</button>
+        <button class="generate-btn" onclick="generateConfig()">Создать конфиг</button>
+    </div>
+</div>
 
 <script>
 function addRow() {
@@ -45,12 +117,13 @@ function addRow() {
     div.innerHTML = `
         <input type="text" placeholder="Название песни">
         <input type="text" placeholder="SoundEvent Name">
+        <button class="remove-btn" onclick="this.parentElement.remove()">✖</button>
     `;
 
     document.getElementById("inputs").appendChild(div);
 }
 
-// Добавляем первую строку
+// первая строка
 addRow();
 
 function generateConfig() {
@@ -60,8 +133,8 @@ function generateConfig() {
 
     rows.forEach((row, index) => {
         const inputs = row.querySelectorAll("input");
-        const song = inputs[0].value;
-        const sound = inputs[1].value;
+        const song = inputs[0].value.trim();
+        const sound = inputs[1].value.trim();
 
         if (song && sound) {
             musicBlock += `        "${index + 1}"\n`;
