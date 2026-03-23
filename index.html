@@ -4,15 +4,12 @@
 <meta charset="UTF-8">
 <title>RoundEndSound Generator</title>
 
-<style>
-* {
-    box-sizing: border-box;
-}
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
+<style>
 body {
-    margin: 0;
-    font-family: "Segoe UI", sans-serif;
-    background: linear-gradient(135deg, #141e30, #243b55);
+    background: linear-gradient(135deg, #141e30, #000000);
     height: 100vh;
     display: flex;
     align-items: center;
@@ -20,123 +17,111 @@ body {
     color: white;
 }
 
-.container {
-    background: #1f2937;
+.container-box {
+    background: #00000012;
     padding: 20px;
-    border-radius: 15px;
-    width: 700px;
+    /*border-radius: 15px;*/
+    width: 800px;
     height: 85vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-h2 {
-    text-align: center;
-    margin-bottom: 10px;
+/* scrollbar */
+
+::-webkit-scrollbar-thumb {
+  border-width: 1px 1px 1px 2px;
+  background-color: #ffffff;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  border-width: 1px 1px 1px 2px;
+  border-color: var(--span);
+  background-color: var(--span);
+}
+
+::-webkit-scrollbar-track {
+  border-width: 0;
+}
+
+::-webkit-scrollbar-track:hover {
+      background-color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  background-color: #00000000;
+  width: 2px;
+  height: 2px;
 }
 
 .inputs-container {
     flex: 1;
     overflow-y: auto;
-    padding-right: 5px;
-    margin-bottom: 10px;
 }
 
-.inputs-container::-webkit-scrollbar {
-    width: 6px;
-}
-.inputs-container::-webkit-scrollbar-thumb {
-    background: #3b82f6;
-    border-radius: 10px;
-}
-
-.row {
+.row-item {
     display: flex;
     gap: 6px;
     margin-bottom: 8px;
 }
 
 input {
-    flex: 1;
-    padding: 7px;
-    border-radius: 6px;
-    border: none;
-    outline: none;
-    font-size: 12px;
+    font-size: 13px !important;
 }
 
-button {
-    border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.2s;
-}
-
-.controls {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.left-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.add-btn { background: #10b981; }
-.add10-btn { background: #22c55e; }
-.generate-btn { background: #3b82f6; }
-.generate2-btn { background: #a855f7; }
-
-.add-btn:hover { background: #059669; }
-.add10-btn:hover { background: #16a34a; }
-.generate-btn:hover { background: #2563eb; }
-.generate2-btn:hover { background: #9333ea; }
-
-.remove-btn {
-    background: #ef4444;
-    padding: 0 8px;
-}
-.remove-btn:hover {
-    background: #dc2626;
+.invalid {
+    border: 2px solid #ef4444 !important;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <h2>🎵 RoundEndSound Generator</h2>
+<div class="container-box">
+    <h3 class="text-center mb-3">🎵 RoundEndSound Generator</h3>
 
-    <div id="inputs" class="inputs-container"></div>
+    <div id="inputs" class="inputs-container mb-3"></div>
 
-    <div class="controls">
-        <div class="left-buttons">
-            <button class="add-btn" onclick="addRow()">➕</button>
-            <button class="add10-btn" onclick="addMultiple(10)">+10</button>
+    <div class="d-flex justify-content-between">
+        <div class="d-flex gap-2">
+            <button class="btn btn-success" onclick="addRow()">➕</button>
+            <button class="btn btn-success" onclick="addMultiple(10)">+10</button>
         </div>
 
-        <div class="left-buttons">
-            <button class="generate-btn" onclick="generateINI()">Создать ini</button>
-            <button class="generate2-btn" onclick="generateVSNDEvents()">Создать vsndevts</button>
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" onclick="generateINI()">Создать ini</button>
+            <button class="btn btn-warning" onclick="generateVSNDEvents()">Создать vsndevts</button>
         </div>
     </div>
 </div>
 
 <script>
+
+function isValidEventName(name) {
+    return /^[A-Za-z_][A-Za-z0-9_.]*$/.test(name);
+}
+
 function createRow() {
     const div = document.createElement("div");
-    div.className = "row";
+    div.className = "row-item";
 
     div.innerHTML = `
-        <input type="text" placeholder="Название песни">
-        <input type="text" placeholder="SoundEvent Name">
-        <input type="text" placeholder="SoundPath (sounds/... .vsnd)">
-        <button class="remove-btn" onclick="this.parentElement.remove()">✖</button>
+        <input type="text" class="form-control" placeholder="Название песни">
+        <input type="text" class="form-control event-input" placeholder="SoundEvent Name">
+        <input type="text" class="form-control" placeholder="SoundPath (sounds/... .vsnd)">
+        <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">✖</button>
     `;
+
+    // 👉 Валидация при вводе
+    const eventInput = div.querySelector(".event-input");
+
+    eventInput.addEventListener("input", () => {
+        if (!isValidEventName(eventInput.value)) {
+            eventInput.classList.add("invalid");
+        } else {
+            eventInput.classList.remove("invalid");
+        }
+    });
 
     return div;
 }
@@ -152,11 +137,23 @@ function addMultiple(count) {
     }
 }
 
-// старт
 addMultiple(3);
 
+function validateAll() {
+    const inputs = document.querySelectorAll(".event-input");
+    for (let input of inputs) {
+        if (input.value && !isValidEventName(input.value)) {
+            alert("Ошибка: SoundEvent Name содержит недопустимые символы!");
+            return false;
+        }
+    }
+    return true;
+}
+
 function generateINI() {
-    const rows = document.querySelectorAll(".row");
+    if (!validateAll()) return;
+
+    const rows = document.querySelectorAll(".row-item");
     let musicBlock = "";
     let index = 1;
 
@@ -168,8 +165,8 @@ function generateINI() {
         if (song && sound) {
             musicBlock += `        "${index}"\n`;
             musicBlock += `        {\n`;
-            musicBlock += `            "Name"        "${song}"\n`;
-            musicBlock += `            "Sound"       "${sound}"\n`;
+            musicBlock += `            "Name" "${song}"\n`;
+            musicBlock += `            "Sound" "${sound}"\n`;
             musicBlock += `        }\n`;
             index++;
         }
@@ -177,8 +174,8 @@ function generateINI() {
 
     const config = `"RoundEndSound"
 {
-    "DefaultVolume"                 "5"
-    "DisableRandom"                 "0"
+    "DefaultVolume" "5"
+    "DisableRandom" "0"
 
     "Music"
     {
@@ -190,8 +187,9 @@ ${musicBlock}
 }
 
 function generateVSNDEvents() {
-    const rows = document.querySelectorAll(".row");
+    if (!validateAll()) return;
 
+    const rows = document.querySelectorAll(".row-item");
     let eventsBlock = "";
 
     rows.forEach(row => {
@@ -200,66 +198,16 @@ function generateVSNDEvents() {
         const path = inputs[2].value.trim();
 
         if (eventName && path) {
-            eventsBlock += `    ${eventName} = \n`;
+            eventsBlock += `    ${eventName} =\n`;
             eventsBlock += `    {\n`;
             eventsBlock += `        base = "roundendsound.base"\n`;
             eventsBlock += `        vsnd_files = "${path}"\n`;
-            eventsBlock += `        volume = 1.000000\n`;
+            eventsBlock += `        volume = 1.0\n`;
             eventsBlock += `    }\n`;
         }
     });
 
-    const config = `<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
-{
-    Event.CTWin = 
-    {
-        type = "csgo_mega"
-        volume = 0.000000
-    }
-    Event.TERWin = 
-    {
-        type = "csgo_mega"
-        volume = 0.000000
-    }
-    Announcer.CTWin.CS2_Classic = 
-    {
-        type = "csgo_mega"
-        volume = 0.000000
-    }
-    Announcer.TWin.CS2_Classic = 
-    {
-        type = "csgo_mega"
-        volume = 0.000000
-    }
-    roundendsound.base = 
-    {
-        type = "csgo_music"
-        priority = 5.000000
-        stop_music = "true"
-        volume_fade_out_input_max = 1.600000
-        loop_track = "false"
-        should_queue_track = "true"
-        block_won_lost = "true"
-        startpoint_01 = 0.000000
-        startpoint_02 = 0.000000
-        startpoint_03 = 0.000000
-        endpoint_01 = 0.000000
-        endpoint_02 = 0.000000
-        endpoint_03 = 0.000000
-        syncpoints_01 = 
-        [
-            0.000000,
-        ]
-        syncpoints_02 = 
-        [
-            0.000000,
-        ]
-        syncpoints_03 = 
-        [
-            0.000000,
-        ]
-    }
-
+    const config = `{
 ${eventsBlock}
 }`;
 
