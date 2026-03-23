@@ -16,7 +16,6 @@ body {
     color: white;
 }
 
-/* Container */
 .container-box {
     background: rgba(28, 28, 30, 0.15);
     padding: 20px;
@@ -25,19 +24,15 @@ body {
     display: flex;
     flex-direction: column;
     backdrop-filter: blur(20px);
-    /*border-radius: 16px;*/
-    /*border: 1px solid rgba(255,255,255,0.08);*/
     box-shadow: 0 10px 40px rgba(0,0,0,0.6);
 }
 
-/* Inputs container */
 .inputs-container {
     flex: 1;
     overflow-y: auto;
     padding-right: 6px;
 }
 
-/* ✨ Apple-style thin scrollbar */
 .inputs-container::-webkit-scrollbar {
     width: 6px;
 }
@@ -56,20 +51,17 @@ body {
     background: rgba(255,255,255,0.3);
 }
 
-/* Firefox */
 .inputs-container {
     scrollbar-width: thin;
     scrollbar-color: rgba(255,255,255,0.2) transparent;
 }
 
-/* Row */
 .row-item {
     display: flex;
     gap: 8px;
     margin-bottom: 10px;
 }
 
-/* Inputs */
 .input-group-custom {
     position: relative;
     flex: 1;
@@ -104,7 +96,6 @@ body {
     border: 1px solid #ff3b30 !important;
 }
 
-/* Buttons (Apple style) */
 .btn {
     border: 1px solid rgba(255,255,255,0.12);
     border-radius: 10px;
@@ -174,28 +165,24 @@ function createRow() {
             <input type="text" placeholder="Название песни">
         </div>
 
-        <div class="input-group-custom">
-            <span class="input-icon">⚡</span>
-            <input type="text" class="event-input" placeholder="SoundEvent Name">
-        </div>
 
         <div class="input-group-custom">
             <span class="input-icon">📁</span>
-            <input type="text" placeholder="sounds/... .vsnd">
+            <input type="text" placeholder="sounds/res/track.vsnd">
         </div>
 
         <button class="btn btn-danger" onclick="this.parentElement.remove()">✖</button>
     `;
 
-    const eventInput = div.querySelector(".event-input");
+    // const eventInput = div.querySelector(".event-input");
 
-    eventInput.addEventListener("input", () => {
-        if (!isValidEventName(eventInput.value)) {
-            eventInput.classList.add("invalid");
-        } else {
-            eventInput.classList.remove("invalid");
-        }
-    });
+    // eventInput.addEventListener("input", () => {
+    //     if (!isValidEventName(eventInput.value)) {
+    //         eventInput.classList.add("invalid");
+    //     } else {
+    //         eventInput.classList.remove("invalid");
+    //     }
+    // });
 
     return div;
 }
@@ -217,7 +204,7 @@ function validateAll() {
     const inputs = document.querySelectorAll(".event-input");
     for (let input of inputs) {
         if (input.value && !isValidEventName(input.value)) {
-            alert("Ошибка: SoundEvent Name содержит недопустимые символы!");
+            alert("Ошибка: SoundEvent Name содержит недопустимые символы!\n\nНе используйте в начале цифры\n Символ - \n Русские буквы");
             return false;
         }
     }
@@ -238,10 +225,9 @@ function generateINI() {
         const eventName = inputs[1].value.trim();
 
         if (song && eventName) {
-            musicBlock += `        "${index}"\n`;
+            musicBlock += `        "${song}"\n`;
             musicBlock += `        {\n`;
-            musicBlock += `            "Name" "${song}"\n`;
-            musicBlock += `            "Sound" "${eventName}"\n`;
+            musicBlock += `            "sound_event"         "track.${index}"\n`;
             musicBlock += `        }\n`;
             index++;
         }
@@ -249,8 +235,9 @@ function generateINI() {
 
     const config = `"RoundEndSound"
 {
-    "DefaultVolume" "5"
-    "DisableRandom" "0"
+    "DefaultVolume"         "5"
+    "DisableRandom"         "0"
+    "Config"                "1"
 
     "Music"
     {
@@ -262,23 +249,24 @@ ${musicBlock}
 }
 
 function generateVSNDEvents() {
-    const rows = document.querySelectorAll(".row-item"); // ✅ исправлено
+    const rows = document.querySelectorAll(".row-item");
 
     let eventsBlock = "";
+    let index = 1;
 
     rows.forEach(row => {
         const inputs = row.querySelectorAll("input");
 
-        const eventName = inputs[1]?.value.trim();
-        const path = inputs[2]?.value.trim();
+        const path = inputs[1]?.value.trim();
 
-        if (eventName && path) {
-            eventsBlock += `    ${eventName} = \n`;
+        if (path) {
+            eventsBlock += `    track.${index} = \n`;
             eventsBlock += `    {\n`;
             eventsBlock += `        base = "roundendsound.base"\n`;
             eventsBlock += `        vsnd_files = "${path}"\n`;
             eventsBlock += `        volume = 1.000000\n`;
             eventsBlock += `    }\n`;
+            index++;
         }
     });
 
