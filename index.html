@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>RoundEndSound Config Generator</title>
+<title>RoundEndSound Generator</title>
 
 <style>
 * {
@@ -24,8 +24,8 @@ body {
     background: #1f2937;
     padding: 20px;
     border-radius: 15px;
-    width: 600px;
-    height: 80vh;
+    width: 700px;
+    height: 85vh;
     display: flex;
     flex-direction: column;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -36,7 +36,6 @@ h2 {
     margin-bottom: 10px;
 }
 
-/* СКРОЛЛ ОБЛАСТЬ */
 .inputs-container {
     flex: 1;
     overflow-y: auto;
@@ -44,7 +43,6 @@ h2 {
     margin-bottom: 10px;
 }
 
-/* КРАСИВЫЙ СКРОЛЛ */
 .inputs-container::-webkit-scrollbar {
     width: 6px;
 }
@@ -55,7 +53,7 @@ h2 {
 
 .row {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     margin-bottom: 8px;
 }
 
@@ -65,11 +63,7 @@ input {
     border-radius: 6px;
     border: none;
     outline: none;
-    font-size: 13px;
-}
-
-input:focus {
-    box-shadow: 0 0 5px #3b82f6;
+    font-size: 12px;
 }
 
 button {
@@ -92,35 +86,20 @@ button {
     gap: 10px;
 }
 
-.add-btn {
-    background: #10b981;
-}
+.add-btn { background: #10b981; }
+.add10-btn { background: #22c55e; }
+.generate-btn { background: #3b82f6; }
+.generate2-btn { background: #a855f7; }
 
-.add-btn:hover {
-    background: #059669;
-}
-
-.add10-btn {
-    background: #22c55e;
-}
-
-.add10-btn:hover {
-    background: #16a34a;
-}
-
-.generate-btn {
-    background: #3b82f6;
-}
-
-.generate-btn:hover {
-    background: #2563eb;
-}
+.add-btn:hover { background: #059669; }
+.add10-btn:hover { background: #16a34a; }
+.generate-btn:hover { background: #2563eb; }
+.generate2-btn:hover { background: #9333ea; }
 
 .remove-btn {
     background: #ef4444;
     padding: 0 8px;
 }
-
 .remove-btn:hover {
     background: #dc2626;
 }
@@ -130,7 +109,7 @@ button {
 <body>
 
 <div class="container">
-    <h2>🎵 RoundEndSound Config Generator</h2>
+    <h2>🎵 RoundEndSound Generator</h2>
 
     <div id="inputs" class="inputs-container"></div>
 
@@ -140,7 +119,10 @@ button {
             <button class="add10-btn" onclick="addMultiple(10)">+10</button>
         </div>
 
-        <button class="generate-btn" onclick="generateConfig()">Создать конфиг</button>
+        <div class="left-buttons">
+            <button class="generate-btn" onclick="generateINI()">Создать ini</button>
+            <button class="generate2-btn" onclick="generateVSNDEvents()">Создать vsndevts</button>
+        </div>
     </div>
 </div>
 
@@ -152,6 +134,7 @@ function createRow() {
     div.innerHTML = `
         <input type="text" placeholder="Название песни">
         <input type="text" placeholder="SoundEvent Name">
+        <input type="text" placeholder="SoundPath (sounds/... .vsnd)">
         <button class="remove-btn" onclick="this.parentElement.remove()">✖</button>
     `;
 
@@ -164,20 +147,17 @@ function addRow() {
 
 function addMultiple(count) {
     const container = document.getElementById("inputs");
-
     for (let i = 0; i < count; i++) {
         container.appendChild(createRow());
     }
 }
 
-// стартовые строки
+// старт
 addMultiple(3);
 
-function generateConfig() {
+function generateINI() {
     const rows = document.querySelectorAll(".row");
-
     let musicBlock = "";
-
     let index = 1;
 
     rows.forEach(row => {
@@ -206,11 +186,65 @@ ${musicBlock}
     }
 }`;
 
-    const blob = new Blob([config], { type: "text/plain" });
+    downloadFile(config, "roundendsound.ini");
+}
+
+function generateVSNDEvents() {
+    const rows = document.querySelectorAll(".row");
+
+    let eventsBlock = "";
+
+    rows.forEach(row => {
+        const inputs = row.querySelectorAll("input");
+        const eventName = inputs[1].value.trim();
+        const path = inputs[2].value.trim();
+
+        if (eventName && path) {
+            eventsBlock += `    ${eventName} = \n`;
+            eventsBlock += `    {\n`;
+            eventsBlock += `        base = "roundendsound.base"\n`;
+            eventsBlock += `        vsnd_files = "${path}"\n`;
+            eventsBlock += `        volume = 1.000000\n`;
+            eventsBlock += `    }\n`;
+        }
+    });
+
+    const config = `<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+    Event.CTWin = 
+    {
+        type = "csgo_mega"
+        volume = 0.000000
+    }
+    Event.TERWin = 
+    {
+        type = "csgo_mega"
+        volume = 0.000000
+    }
+
+    roundendsound.base = 
+    {
+        type = "csgo_music"
+        priority = 5.000000
+        stop_music = "true"
+        volume_fade_out_input_max = 1.600000
+        loop_track = "false"
+        should_queue_track = "true"
+        block_won_lost = "true"
+    }
+
+${eventsBlock}
+}`;
+
+    downloadFile(config, "soundevents_roundendsound.vsndevts");
+}
+
+function downloadFile(content, filename) {
+    const blob = new Blob([content], { type: "text/plain" });
     const a = document.createElement("a");
 
     a.href = URL.createObjectURL(blob);
-    a.download = "roundendsound.ini";
+    a.download = filename;
     a.click();
 }
 </script>
